@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Athenaeum: Digital Library Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Custom styles for better scroll and UI flow */
+      .active-link {
+        border-bottom: 3px solid #6366f1; /* Indigo-500 */
+      }
+      .container-section {
+        display: none;
+      }
+      .container-section.active {
+        display: block;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 font-sans">
+    <nav class="bg-white shadow-lg sticky top-0 z-10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex">
+            <div class="flex-shrink-0 flex items-center">
+              <span class="text-2xl font-bold text-indigo-600"
+                >📚 Athenaeum</span
+              >
+            </div>
+            <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+              <a
+                href="#"
+                data-section="home"
+                class="nav-link text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium active-link"
+              >
+                Home
+              </a>
+              <a
+                href="#"
+                data-section="add-book"
+                class="nav-link text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 text-sm font-medium"
+              >
+                Add New Book
+              </a>
+              <a
+                href="#"
+                data-section="book-list"
+                class="nav-link text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 text-sm font-medium"
+              >
+                View All Books
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <section id="home" class="container-section active">
+        <div class="text-center bg-white p-8 rounded-lg shadow-xl">
+          <h1 class="text-4xl font-extrabold text-gray-900 mb-4">
+            Welcome to The Athenaeum
+          </h1>
+          <p class="text-xl text-gray-600 mb-6">
+            Your simple, dynamic, front-end Library Management System.
+          </p>
+          <button
+            onclick="switchSection('book-list')"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 shadow-md"
+          >
+            Start Managing Books
+          </button>
+        </div>
+      </section>
+
+      <section
+        id="add-book"
+        class="container-section bg-white p-8 rounded-lg shadow-xl"
+      >
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">➕ Add New Book</h2>
+        <form id="addBookForm" class="space-y-6">
+          <div>
+            <label for="title" class="block text-sm font-medium text-gray-700"
+              >Title</label
+            >
+            <input
+              type="text"
+              id="title"
+              name="title"
+              required
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          <div>
+            <label for="author" class="block text-sm font-medium text-gray-700"
+              >Author</label
+            >
+            <input
+              type="text"
+              id="author"
+              name="author"
+              required
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          <div>
+            <label for="isbn" class="block text-sm font-medium text-gray-700"
+              >ISBN (Optional)</label
+            >
+            <input
+              type="text"
+              id="isbn"
+              name="isbn"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          <button
+            type="submit"
+            class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-md transition duration-300"
+          >
+            Add Book to Library
+          </button>
+          <div id="addStatus" class="mt-4 text-center font-medium"></div>
+        </form>
+      </section>
+
+      <section
+        id="book-list"
+        class="container-section bg-white p-8 rounded-lg shadow-xl"
+      >
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">
+          📖 All Managed Books
+        </h2>
+        <div id="bookListContainer" class="space-y-4"></div>
+        <p id="emptyMessage" class="text-center text-gray-500 mt-6 hidden">
+          The library is empty! Add some books to get started.
+        </p>
+      </section>
+    </main>
+
+    <footer class="bg-gray-800 mt-12">
+      <div
+        class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-gray-400 text-sm"
+      >
+        &copy; 2025 The Athenaeum. Mini Project by Gemini AI.
+      </div>
+    </footer>
+
+    <script>
+      const STORAGE_KEY = "libraryBooks";
+
+      // --- SECTION SWITCHING (UI/UX) ---
+      function switchSection(targetId) {
+        // Remove active class from all sections
+        document.querySelectorAll(".container-section").forEach((section) => {
+          section.classList.remove("active");
+        });
+
+        // Add active class to the target section
+        document.getElementById(targetId).classList.add("active");
+
+        // Update active link in navbar
+        document.querySelectorAll(".nav-link").forEach((link) => {
+          link.classList.remove("active-link");
+          if (link.getAttribute("data-section") === targetId) {
+            link.classList.add("active-link");
+          }
+        });
+      }
+
+      // Initialize section switching on link click
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          switchSection(e.target.getAttribute("data-section"));
+        });
+      });
+
+      // --- LOCAL STORAGE & BOOK MANAGEMENT ---
+
+      // Get books from Local Storage or return an empty array
+      function getBooks() {
+        const booksJson = localStorage.getItem(STORAGE_KEY);
+        return booksJson ? JSON.parse(booksJson) : [];
+      }
+
+      // Save the current book array back to Local Storage
+      function saveBooks(books) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
+      }
+
+      // Handle Add Book Form Submission
+      document
+        .getElementById("addBookForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const title = document.getElementById("title").value.trim();
+          const author = document.getElementById("author").value.trim();
+          const isbn = document.getElementById("isbn").value.trim();
+          const addStatus = document.getElementById("addStatus");
+
+          if (!title || !author) {
+            addStatus.className = "text-red-500";
+            addStatus.textContent = "Please fill in both Title and Author.";
+            return;
+          }
+
+          const newBook = {
+            id: Date.now(), // Unique ID for identification
+            title: title,
+            author: author,
+            isbn: isbn,
+            status: "Available", // Initial status
+          };
+
+          const books = getBooks();
+          books.push(newBook);
+          saveBooks(books);
+
+          // Clear form and show success message
+          this.reset();
+          addStatus.className = "text-green-600";
+          addStatus.textContent = `"${title}" added successfully!`;
+
+          // Auto-clear message after 3 seconds
+          setTimeout(() => (addStatus.textContent = ""), 3000);
+
+          renderBookList(); // Update the list immediately
+        });
+
+      // Toggle book status (Borrow <-> Available)
+      function toggleStatus(bookId) {
+        let books = getBooks();
+        const index = books.findIndex((book) => book.id === bookId);
+
+        if (index !== -1) {
+          const currentStatus = books[index].status;
+          // Simple toggle: Available -> Borrowed, Borrowed -> Available
+          books[index].status =
+            currentStatus === "Available" ? "Borrowed" : "Available";
+          saveBooks(books);
+          renderBookList(); // Re-render the list
+        }
+      }
+
+      // Remove a book (e.g., when a borrowed book is permanently returned/deleted)
+      function removeBook(bookId) {
+        if (
+          !confirm(
+            "Are you sure you want to permanently remove this book from the system?"
+          )
+        ) {
+          return;
+        }
+        let books = getBooks();
+        // Filter out the book with the matching ID
+        books = books.filter((book) => book.id !== bookId);
+        saveBooks(books);
+        renderBookList(); // Re-render the list
+      }
+
+      // --- RENDERING (HTML Injection) ---
+
+      function renderBookList() {
+        const books = getBooks();
+        const container = document.getElementById("bookListContainer");
+        const emptyMessage = document.getElementById("emptyMessage");
+        container.innerHTML = ""; // Clear existing content
+
+        if (books.length === 0) {
+          emptyMessage.classList.remove("hidden");
+          return;
+        }
+        emptyMessage.classList.add("hidden");
+
+        books.forEach((book) => {
+          const isBorrowed = book.status === "Borrowed";
+          const statusColor = isBorrowed
+            ? "bg-red-100 text-red-800"
+            : "bg-green-100 text-green-800";
+          const actionButtonText = isBorrowed ? "Return Book" : "Borrow Book";
+          const actionButtonColor = isBorrowed
+            ? "bg-indigo-500 hover:bg-indigo-600"
+            : "bg-yellow-500 hover:bg-yellow-600";
+
+          const bookCard = `
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition duration-200">
+                        <div class="mb-3 sm:mb-0 sm:w-2/3">
+                            <p class="text-lg font-semibold text-gray-900">${
+                              book.title
+                            }</p>
+                            <p class="text-sm text-gray-600">by ${
+                              book.author
+                            }</p>
+                            <p class="text-xs text-gray-400">ISBN: ${
+                              book.isbn || "N/A"
+                            }</p>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <span class="px-3 py-1 text-xs font-medium rounded-full ${statusColor}">
+                                ${book.status}
+                            </span>
+                            
+                            <button onclick="toggleStatus(${book.id})" 
+                                class="text-white font-medium py-2 px-3 rounded-md text-sm transition duration-150 ${actionButtonColor}">
+                                ${actionButtonText}
+                            </button>
+                            
+                            <button onclick="removeBook(${book.id})" 
+                                class="text-gray-400 hover:text-red-600 p-2 rounded-full transition duration-150" 
+                                title="Remove Permanently">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+          container.innerHTML += bookCard;
+        });
+      }
+
+      // Initial render and setup
+      document.addEventListener("DOMContentLoaded", () => {
+        renderBookList(); // Load books when the page loads
+      });
+    </script>
+  </body>
+</html>
